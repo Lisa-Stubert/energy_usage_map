@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Strom- und Wärmeverbrauch öffentlicher Gebäude in Friedrichshain-Kreuzberg 2019</title>
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+		<link rel="stylesheet" href="css/style.css"> 
+		<link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet">		
+		<script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+	</head>
+	<body>
+		<div id="map"></div>
+		<div class="map-overlay top">
+			<div class="map-overlay-inner">
+				<h1>Energieverbrauch 2019</h1>
+				<h2>öffentlicher Gebäude in Friedrichshain-Kreuzberg</h2>
+				<p>Diese Karte zeigt Energieverbrauchsdaten der vom Bezirk betriebenen Gebäude. Diese werden regelmäßig im Rahmen des Energiemanagements ausgewertet und im <a href="https://daten.berlin.de/datensaetze/energieverbrauchsübersicht-bezirklicher-gebäude-2019-bezirk-friedrichshain-kreuzberg" style="text-decoration-line:underline;">Berliner Datenportal</a> veröffentlicht.</p>
+				<fieldset>
+				</fieldset>
+				<fieldset>
+				<label style="margin-top:5px;margin-bottom:-2px;">Gebäude einfärben nach...</label>
+				<div id="swatches"></div>
+				</fieldset>
+				<div id='legend'></div>
+				<div style="margin-bottom:15px;" id="menu"></div>
+			</div>
+		</div>
+
+		<script>
+			// Map settings
+			mapboxgl.accessToken = ''
+			var map = new mapboxgl.Map({
+				container: 'map',
+				style: 'mapbox://styles/mapbox/dark-v10',
+				center: [13.399351, 52.492014],
+				zoom: 14.99,
+				pitch: 60,
+				bearing: 20,
+				antialias: true
+			});
+		
+			// Load and style data
+			map.on('load', function () {
+				map.addSource('building_data_source', {
+					'type': 'geojson',
+					'data': 'data/building_data_fk.geojson'
+				});
+
+				map.addSource('all_buildings_fk_source', {
+					'type': 'geojson',
+					'data': 'data/all_buildings_fk.geojson'
+				});
+
+				map.addLayer({
+					'id': 'building_data',
+					'type': 'fill-extrusion',
+					'source': 'building_data_source',
+					'paint': {
+						'fill-extrusion-color': {
+							"property": "Wärmeverbrauch",
+							"type": "interval",
+							"stops": [
+								[0, 'lightgrey'],
+								[1, '#FFEDA0'],
+								[1000000, '#FEB24C'],
+								[2000000, '#FD8D3C'],
+								[3000000, '#FC4E2A'],
+								[4000000, '#BD0026'],
+							],
+						},
+						'fill-extrusion-height': ['get', 'height'],
+						'fill-extrusion-base': 0,
+						'fill-extrusion-opacity': 0.8
+					}
+				});
+
+				map.addLayer({
+					'id': 'all_buildings_fk',
+					'type': 'fill-extrusion',
+					'source': 'all_buildings_fk_source',
+					'paint': {
+						'fill-extrusion-color': 'grey',
+						'fill-extrusion-height': ['get', 'height'],
+						'fill-extrusion-base': 0,
+						'fill-extrusion-opacity': 0.6
+					}
+				});
+
+				// Set up Pop-ups
+				map.on('click', 'building_data', function (e) {
+					new mapboxgl.Popup()
+					.setLngLat(e.lngLat)
+					.setHTML(
+						'<h3>' + e.features[0].properties.Einrichtung + '</h3>' +
+						'<p style="font-style:italic;margin:5px 0">' + e.features[0].properties.bezgfk + '</p>' +
+						'<h4>Art der Wärmeversorgung: </h4><a>'+ e.features[0].properties.Wärmeversorgung + '</a>' + '<br>' +
+						'<h4>Wärmeverbrauch: </h4><a>' + e.features[0].properties.waermeverbrauch + ' kWh' + '</a>' + '<br>' + 
+						'<h4>Stromverbrauch: </h4><a>' + e.features[0].properties.stromverbrauch + ' kWh' + '</a>' + '<br>' +
+						'<h4>Anmerkung: </h4><a>' + e.features[0].properties.Bemerkungen + '</a>')
+					.addTo(map);
+				});
+
+				// Change the cursor to a pointer when the mouse is over the states layer.
+				map.on('mouseenter', 'building_data', function () {
+					map.getCanvas().style.cursor = 'pointer';
+				});
+				
+				// Change it back to a pointer when it leaves.
+				map.on('mouseleave', 'building_data', function () {
+					map.getCanvas().style.cursor = '';
+				});
+
+			});
+
+
+
+			// Menu for showing and hiding layers
+			map.on('idle', function () {
+				// If these two layers have been added to the style,
+				// add the toggle buttons.
+				if (map.getLayer('building_data') && map.getLayer('all_buildings_fk')) {
+					// Enumerate ids of the layers.
+					var toggleableLayerIds = ['all_buildings_fk'];
+					// Set up the corresponding toggle button for each layer.
+					for (var i = 0; i < toggleableLayerIds.length; i++) {
+						var id = toggleableLayerIds[i];
+						if (!document.getElementById(id)) {
+							// Create a link.
+							var link = document.createElement('button');
+							link.id = id;
+							link.href = '#';
+							link.Content = id;
+							link.textContent ='Zeige nur öffentliche Gebäude'
+							link.className = 'disabled';
+							// Show or hide layer when the toggle is clicked.
+							link.onclick = function (e) {
+								var clickedLayer = this.Content;
+								e.preventDefault();
+								e.stopPropagation();					
+								var visibility = map.getLayoutProperty(
+									clickedLayer,
+									'visibility'
+								);						
+								// Toggle layer visibility by changing the layout object's visibility property.
+								if (visibility === 'visible') {
+									map.setLayoutProperty(
+										clickedLayer,
+										'visibility',
+										'none'
+									);
+									this.className = 'active';
+								} else {
+									this.className = 'disabled';
+									map.setLayoutProperty(
+										clickedLayer,
+										'visibility',
+										'visible'
+									);
+								}
+							};
+							
+							var layers = document.getElementById('menu');
+							layers.appendChild(link);
+						}
+					}
+				}
+			});
+
+			// create function to build the legends
+			function buildLegend(layers,colors){
+				legend.innerHTML="";
+				for (i = 0; i < layers.length; i++) {
+					var layer1 = layers[i];
+					var color1 = colors[i];
+					var item = document.createElement('div');
+					var key = document.createElement('span');
+					key.className = 'legend-key';
+					key.style.backgroundColor = color1;
+
+					var value = document.createElement('span');
+					value.innerHTML = layer1;
+					item.appendChild(key);
+					item.appendChild(value);
+					legend.appendChild(item);
+				}
+			}
+
+			// set up legend that is displayed in the beginning
+			var layers_start = ['<1000 MWh', '10000-20000 MWh', '20000-30000 MWh', '30000-40000 MWh', '>40000 MWh'];
+			var colors_start = ['#FFEDA0', '#FEB24C', '#FD8D3C', '#FC4E2A', '#BD0026'];
+
+			buildLegend(layers_start,colors_start);
+
+			// add buttons for switching between data properties
+			var swatches = document.getElementById('swatches');
+			var select_types = [	
+				{
+					"property": "Wärmeversorgung",
+					"type": "categorical",
+					"stops": [
+						["-", 'lightgrey'],
+						["Gas",'#1B57A6'],
+						["Fernwärme",'#F27830'],
+						["Heizöl",'#0D7356'],
+						["Fernwärme, Gas",'#F23558'],
+					]
+				},
+				{
+					"property": "Wärmeverbrauch",
+					"type": "interval",
+					"stops": [
+						[0, 'lightgrey'],
+						[1, '#FFEDA0'],
+						[1000000, '#FEB24C'],
+						[2000000, '#FD8D3C'],
+						[3000000, '#FC4E2A'],
+						[4000000, '#BD0026'],
+					]
+				},
+				{
+					"property": "Stromverbrauch",
+					"type": "interval",
+					"stops": [
+						[0, 'lightgrey'],
+						[1, '#FFF0A5'],
+						[200000, '#FEB24C'],
+						[400000, '#C4D7ED'],
+						[600000, '#1386BF'],
+						[800000, '#0E468C'],
+					]
+				},			
+			];
+			select_types.forEach(function (type) {
+				var swatch = document.createElement('button');
+				swatch.innerHTML = type.property;
+				if (type.property == 'Wärmeverbrauch'){
+					swatch.classList.add("active");
+				}
+				swatch.addEventListener('click', function () {
+					// remove active state
+					var elems = document.querySelectorAll("button");
+					[].forEach.call(elems, function(el) {
+						el.className = el.className.replace(/\bactive\b/, "");
+					});
+					// add active state
+					swatch.classList.add("active");
+					map.setPaintProperty('building_data', 'fill-extrusion-color', type);
+					if (type.property == 'Wärmeverbrauch'){
+						var layers = layers_start;
+						var colors = colors_start;
+					}
+					else if (type.property == 'Wärmeversorgung'){
+						var layers = ['Gas', 'Fernwärme', 'Heizöl', 'Fernwärme, Gas'];
+						var colors = ['#1B57A6','#F27830','#0D7356','#F23558'];
+					}
+					else {
+						var layers = ['< 200 MWh', '200 - 400 MWh','400 - 600 MWh','600 - 800 MWh','> 800 MWh'];
+						var colors = ['#FFEDA0', '#FEB24C','#C4D7ED','#1386BF','#0E468C'];
+					}
+
+					buildLegend(layers,colors);
+					
+				});
+
+				swatches.appendChild(swatch);
+				text = document.createElement('span');
+				text.innerHTML = type.property
+				// swatches.appendChild(text);
+				swatches.appendChild(document.createElement('br'));
+			});
+		
+		</script>
+	
+	</body>
+</html>

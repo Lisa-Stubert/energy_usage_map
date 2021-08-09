@@ -1,0 +1,161 @@
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  
+  body {
+    color: #404040;
+    font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin: 0;
+    font-weight: 400;
+    line-height: 20px;
+    padding: 20px 0px;
+    margin-top: -6px;
+    font-weight: bold;
+  }
+
+  a {
+    color: #404040;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #101010;
+  }
+  
+.mapboxgl-popup-close-button {
+display: none;
+}
+
+.mapboxgl-popup-content {
+font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+font-size: 14px;
+padding: 0;
+width: 280px;
+opacity: 1;
+font-size: 12px;
+}
+
+.mapboxgl-popup-content-wrapper {
+padding: 1%;
+}
+
+.mapboxgl-popup-content h3 {
+background: #36362a;
+color: #fff;
+margin: 0;
+display: block;
+padding: 10px;
+border-radius: 3px 3px 0 0;
+font-weight: 700;
+font-size: 14px;
+}
+.mapboxgl-popup-content h4 {
+  display: inline;
+  }
+
+
+
+.map-overlay {
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+position: absolute;
+width: 290px;
+top: 0;
+left: 0;
+padding: 10px;
+}
+
+.map-overlay .map-overlay-inner {
+background-color: #fff;
+opacity: 1;
+box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+border-radius: 3px;
+padding: 10px;
+margin-bottom: 10px;
+}
+
+.map-overlay-inner fieldset {
+border: none;
+padding: 0;
+margin: 0 0 10px;
+}
+
+.map-overlay-inner fieldset:last-child {
+margin: 0;
+}
+
+.map-overlay-inner select {
+width: 100%;
+}
+
+.map-overlay-inner label {
+display: block;
+font-weight: bold;
+margin: 0 0 5px;
+}
+
+.map-overlay-inner button {
+display: inline-block;
+width: 120px;
+height: 20px;
+border: none;
+cursor: pointer;
+margin-top: 10px;
+margin-right: 6px;
+border-radius: 3px;
+}
+
+.map-overlay-inner button.active {
+  background-color:#36362a;
+  color: white;
+  }
+
+.map-overlay-inner button:focus {
+outline: none;
+}
+
+.map-overlay-inner button:hover {
+box-shadow: inset 0 0 0 1px #36362a;
+}
+
+.map-overlay h2 {
+  font-size: 16px;
+  margin-top:-14px;
+  padding-left:0px;
+}
+
+#menu button {
+  width: 180px;
+  background-color:#36362a;
+  color: white;
+  }
+#menu button.disabled {
+  background:none;
+  border: 1px solid #36362a;
+  color: rgb(0, 0, 0);
+  }
+
+#legend {
+padding: 10px;
+line-height: 18px;
+height: 155px;
+margin-bottom: -30px;
+width: 150px;
+}
+
+.legend-key {
+display: inline-block;
+border-radius: 20%;
+width: 15px;
+height: 15px;
+margin-right: 5px;
+}
