@@ -34,6 +34,7 @@
 				style: 'mapbox://styles/mapbox/dark-v10',
 				center: [13.399351, 52.492014],
 				zoom: 14.99,
+				minZoom:15,
 				pitch: 60,
 				bearing: 20,
 				antialias: true
@@ -47,8 +48,8 @@
 				});
 
 				map.addSource('all_buildings_fk_source', {
-					'type': 'geojson',
-					'data': 'data/all_buildings_fk.geojson'
+					'type': 'vector',
+					'url': 'mapbox://lisastubert.3qf7x4xq'
 				});
 
 				map.addLayer({
@@ -78,6 +79,7 @@
 					'id': 'all_buildings_fk',
 					'type': 'fill-extrusion',
 					'source': 'all_buildings_fk_source',
+					'source-layer':'all_buildings_fk-2qhgon',
 					'paint': {
 						'fill-extrusion-color': 'grey',
 						'fill-extrusion-height': ['get', 'height'],
