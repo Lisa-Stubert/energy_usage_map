@@ -32,6 +32,7 @@
 			var map = new mapboxgl.Map({
 				container: 'map',
 				style: 'mapbox://styles/mapbox/dark-v10',
+				style: 'mapbox://styles/mapbox/satellite-v9',
 				center: [13.399351, 52.492014],
 				zoom: 14.99,
 				minZoom:15,
@@ -49,7 +50,7 @@
 
 				map.addSource('all_buildings_fk_source', {
 					'type': 'vector',
-					'url': 'mapbox://lisastubert.3qf7x4xq'
+					'url': 'mapbox://technologiestiftung.ala4himh'
 				});
 
 				map.addLayer({
@@ -79,7 +80,7 @@
 					'id': 'all_buildings_fk',
 					'type': 'fill-extrusion',
 					'source': 'all_buildings_fk_source',
-					'source-layer':'all_buildings_fk-2qhgon',
+					'source-layer':'all_buildings_fk-6qorq4',
 					'paint': {
 						'fill-extrusion-color': 'grey',
 						'fill-extrusion-height': ['get', 'height'],
